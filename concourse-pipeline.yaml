@@ -1,0 +1,33 @@
+---
+resources:
+- name: nginx-helloworld-ecr-image
+  type: ecr-image-resource
+  source:
+    repositoryArn: 477288082536.dkr.ecr.eu-west-1.amazonaws.com/nginx-hello-world
+- name: git-repo
+  type: git
+  source:
+    uri: https://github.com/x1a0-lab/nginx-helloworld
+    branch: concourse
+- name: zli-deploy
+  type: zli
+resource_types:
+- name: ecr-image-resource
+  type: docker-image
+  source:
+    repository: 477288082536.dkr.ecr.eu-west-1.amazonaws.com/ecr-image-resource
+    tag: 0.1
+- name: zli
+  type: docker-image
+  source:
+    repository: 477288082536.dkr.ecr.eu-west-1.amazonaws.com/concourse-zli-resource
+    tag: v2
+jobs:
+- name: deploy-latest-image
+  public: true
+  plan:
+  - get: nginx-helloworld-ecr-image
+    trigger: true
+  - get: git-repo
+  - put: zli-deploy
+
